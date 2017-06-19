@@ -1,0 +1,27 @@
+{
+  "name": "javascript-tetris",
+  "version": "1.0.0",
+  "description": "Tetris in JavaScript.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michowski/javascript-tetris.git"
+  },
+  "keywords": [
+    "tetris",
+    "game",
+    "javascript"
+  ],
+  "author": "Arkadiusz Michowski <arkadiusz@michowski.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/michowski/javascript-tetris/issues"
+  },
+  "homepage": "https://github.com/michowski/javascript-tetris#readme",
+  "devDependencies": {
+    "tape": "^4.6.3"
+  }
+}
