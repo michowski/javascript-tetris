@@ -4,7 +4,7 @@
   "description": "Tetris in JavaScript.",
   "main": "index.js",
   "scripts": {
-    "test": "tape test.js"
+    "test": "tape test.js | faucet"
   },
   "repository": {
     "type": "git",
@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/michowski/javascript-tetris#readme",
   "devDependencies": {
+    "faucet": "0.0.1",
     "tape": "^4.6.3"
   }
 }
