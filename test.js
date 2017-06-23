@@ -5,20 +5,160 @@ const {
   shapes,
   colors,
   makeBoard,
+  step,
 } = require('./index.js')
 
 const compose = (...fs) => x => fs.reduce((acc, f) => f(acc), x)
 
-test('makeBoard', t => {
-  t.test('creates null-ish array', t => {
-    const actual = makeBoard(2, 3)
+const boardFromStr = str => str
+  .trim()
+  .split('\n')
+  .map(line => line
+    .trim()
+    .split('')
+    .map(x => x == 'X' ? -1 : parseInt(x))
+  )
+
+test('boardFromStr', t => {
+  t.test('generates board from string', t => {
+    const input = `
+      XXXX0
+      X1XXX
+      XXXXX
+      XXXXX
+      1XX2X
+      XX1XX
+    `
+
+    const actual = boardFromStr(input)
     const expected = [
-      [null, null],
-      [null, null],
-      [null, null],
+      [-1, -1, -1, -1, 0],
+      [-1, 1, -1, -1, -1],
+      [-1, -1, -1, -1, -1],
+      [-1, -1, -1, -1, -1],
+      [1, -1, -1, 2, -1],
+      [-1, -1, 1, -1, -1],
     ]
 
     t.deepEqual(actual, expected)
+    t.end()
+  })
+})
+
+test('makeBoard', t => {
+  t.test('creates array of -1', t => {
+    const actual = makeBoard(2, 3)
+    const expected = [
+      [-1, -1],
+      [-1, -1],
+      [-1, -1],
+    ]
+
+    t.deepEqual(actual, expected)
+    t.end()
+  })
+})
+
+test('step', t => {
+  t.test('removes full lines', t => {
+    t.test('case: nothing to remove', t => {
+      const board = boardFromStr(`
+        XXXX
+        1XXX
+        X2X1
+        X111
+      `)
+      const player = null
+
+      const res = step(board, player)
+
+      const actual = {
+        removedLines: res.removedLines,
+        board: res.board,
+      }
+      const expected = {
+        board,
+        removedLines: 0,
+      }      
+
+      t.deepEqual(actual, expected)
+      t.end()
+    })
+
+    t.test('case: 2 sibling lines to remove', t => {
+      const board = boardFromStr(`
+        XXXXXXX
+        1XX33XX
+        XX33XXX
+        1111113
+        1123221
+        012301X
+      `)
+      const player = null
+
+      const res = step(board, player)
+
+      const actual = {
+        removedLines: res.removedLines,
+        board: res.board,
+      }
+      const expected = {
+        removedLines: 2,        
+        board: boardFromStr(`
+          XXXXXXX
+          XXXXXXX
+          XXXXXXX
+          1XX33XX
+          XX33XXX
+          012301X
+        `),
+      }
+
+      t.deepEqual(actual, expected)
+      t.end()
+    })
+
+    t.test('case: 3 lines in different places', t => {
+      const board = boardFromStr(`
+        11111000
+        XXXXX2XX
+        33333333
+        13333X11
+        11111X1X
+        01010102
+        X000XXXX
+      `)
+      const player = null
+
+      const res = step(board, player)
+
+      const actual = {
+        removedLines: res.removedLines,
+        board: res.board,
+      }
+      const expected = {
+        removedLines: 3,
+        board: boardFromStr(`
+          XXXXXXXX
+          XXXXXXXX
+          XXXXXXXX
+          XXXXX2XX
+          13333X11
+          11111X1X
+          X000XXXX
+        `),
+      }
+
+      t.deepEqual(actual, expected)
+      t.end()
+    })
+  })
+
+  t.test('moves player down if that is possible', t => {
+    t.end()
+  })
+
+  t.test('attaches player if he can not go down', t => {
     t.end()
   })
 })

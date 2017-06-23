@@ -69,12 +69,28 @@ const shapes = [
 const boardWidth = 10
 const boardHeight = 20
 
+const emptyLine = n => Array(n).fill(-1)
+
+const randomInt = n => Math.floor(Math.random() * (max + 1))
+
+const makeInitialState = () => ({
+  gameStatus: GameStatus.BEFORE,
+  board: makeBoard(boardWidth, boardHeight),
+  player: makePlayer(),
+  score: 0,
+})
+
+const makePlayer = () => ({
+  position: [randomInt(boardWidth - 4), -4],
+  ind: randomInt(shapes.length),
+})
+
 const makeBoard = (width, height) => {
   const board = []
   for (let i = 0; i < height; i++) {
     const row = []
     for (let j = 0; j < width; j++) {
-      row.push(null)
+      row.push(-1)
     }
     board.push(row)
   }
@@ -82,9 +98,43 @@ const makeBoard = (width, height) => {
   return board
 }
 
-const initialState = {
-  gameStatus: GameStatus.BEFORE,
-  board: makeBoard(boardWidth, boardHeight),
+const step = (board, player) => {
+  if (player) {
+    return {
+      board,
+      player,
+      removedLines: 0,
+    }
+  }
+
+  const acc = board
+    .reduce((acc, line, n) => {
+      let {removedLines, newBoard} = acc
+      
+      if (!line.every(x => x !== -1)) {
+        newBoard.push(line)
+      }
+      else {
+        removedLines++
+      }
+
+      return {
+        removedLines,
+        newBoard,
+      }
+    }, {removedLines: 0, newBoard: []})
+
+  const {removedLines, newBoard} = acc
+
+  newBoard.unshift(
+    ...Array(removedLines).fill(emptyLine(board[0].length))
+  )
+
+  return {
+    removedLines,
+    board: newBoard,
+    player: null,
+  }
 }
 
 const rotate = shape => {
@@ -98,11 +148,14 @@ const rotate = shape => {
 }
 
 module.exports = {
-  initialState,
+  randomInt,
+  makePlayer,
+  makeInitialState,
   makeBoard,
   shapes,
   colors,
   boardWidth,
   boardHeight,
   rotate,
+  step,
 }
