@@ -9,6 +9,20 @@ const {
 
 const compose = (...fs) => x => fs.reduce((acc, f) => f(acc), x)
 
+test('makeBoard', t => {
+  t.test('creates null-ish array', t => {
+    const actual = makeBoard(2, 3)
+    const expected = [
+      [null, null],
+      [null, null],
+      [null, null],
+    ]
+
+    t.deepEqual(actual, expected)
+    t.end()
+  })
+})
+
 test('colors', t => {
   t.test('amount matches shapes amount', t => {
     const actual = (colors.length >= shapes.length)
