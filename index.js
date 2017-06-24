@@ -80,10 +80,15 @@ const makeInitialState = () => ({
   score: 0,
 })
 
-const makePlayer = () => ({
-  position: [randomInt(boardWidth - 4), -4],
-  ind: randomInt(shapes.length),
-})
+const makePlayer = () => {
+  const ind = randomInt(shapes.length)
+
+  return {
+    position: [randomInt(boardWidth - 4), -4],
+    shape: shapes[ind],
+    color: colors[ind],
+  }
+}
 
 const makeBoard = (width, height) => {
   const board = []

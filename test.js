@@ -155,10 +155,80 @@ test('step', t => {
   })
 
   t.test('moves player down if that is possible', t => {
-    t.end()
+    t.test('case: simple ground', t => {
+      const player = {
+        position: [3, 3],
+        shape: [
+          [0, 0, 0, 0],
+          [0, 0, 1, 0],
+          [0, 1, 1, 0],
+          [0, 1, 0, 0],
+        ],
+        color: colors[2],
+      }
+      const board = boardFromStr(`
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        10101010
+        01010101
+      `)
+
+      const actual = step(board, player)
+      const expected = {
+        board,
+        removedLines: 0,
+        player: {
+          position: [3, 4],
+          shape: player.shape,
+          color: player.color,
+        },
+      }
+
+      t.deepEqual(actual, expected)
+      t.end()
+    })
+
+    t.test('case: obstacles around player', t => {
+      const player = {
+        position: [0, 0],
+        shape: [
+          [0, 0, 0, 0],
+          [0, 0, 1, 0],
+          [0, 1, 1, 0],
+          [0, 1, 0, 0],
+        ],
+        color: colors[2],        
+      }
+      const board = boardFromStr(`
+        XXXXXXXX
+        XXXXXXXX
+        XXX11111
+        XXX11111
+        1X1XXXX1
+        11111111
+        11111111
+      `)
+
+      const actual = step(board, player)
+      const expected = {
+        board,
+        removedLines: 0,
+        player: {
+          position: [0, 1],
+          shape: player.shape,
+          color: player.color,
+        },
+      }
+
+      t.deepEqual(actual, expected)
+      t.end()      
+    })
   })
 
-  t.test('attaches player if he can not go down', t => {
+  t.test('attaches player to board if he can not move down', t => {
     t.end()
   })
 })
