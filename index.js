@@ -152,6 +152,35 @@ const rotate = shape => {
   )
 }
 
+const move = ({
+  shape,
+  position,
+  board,
+  vector,
+}) => {
+  // new position
+  const x = position[0] + vector[0]
+  const y = position[1] + vector[1]
+
+  const free = shape.every((row, i) =>
+    row.every((_, j) => {
+      a = y + i
+      b = x + j
+
+      return (row[j] === 0) || (
+        a in board
+        && b in board[a]
+        && board[a][b] === -1
+      )
+    })
+  )
+
+  return {
+    free,
+    position: free ? [x, y] : position,
+  }
+}
+
 module.exports = {
   randomInt,
   makePlayer,
@@ -162,5 +191,6 @@ module.exports = {
   boardWidth,
   boardHeight,
   rotate,
+  move,
   step,
 }

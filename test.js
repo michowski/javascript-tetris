@@ -5,6 +5,7 @@ const {
   shapes,
   colors,
   makeBoard,
+  move,
   step,
 } = require('./index.js')
 
@@ -18,6 +19,126 @@ const boardFromStr = str => str
     .split('')
     .map(x => x == 'X' ? -1 : parseInt(x))
   )
+
+test('move', t => {
+  const cases = [
+    {
+      msg: 'can move down if there is a free space, L shape',
+      input: {
+        shape: [
+          [0, 0, 0, 0],
+          [0, 1, 0, 0],
+          [0, 1, 0, 0],
+          [0, 1, 1, 0],
+        ],
+        board: boardFromStr(`
+          XXXXXXXXXX
+          XXXXXXXXXX
+          XXXXX1XXXX
+          XXXXXXXXXX
+          1111XX1111
+          1111XX1111
+          1111111111
+          1111111111
+        `),
+        position: [3, 1],
+        vector: [0, 1],
+      },
+      expected: {
+        free: true,
+        position: [3, 2],
+      },
+    },
+    {
+      msg: 'can move right if there is a free space, T shape',
+      input: {
+        shape: [
+          [0, 0, 0, 0],
+          [0, 1, 0, 0],
+          [0, 1, 1, 0],
+          [0, 1, 0, 0],
+        ],
+        board: boardFromStr(`
+          XXXXXXXXX
+          XXXXXXXXX
+          XXX322223
+          XXX322223
+          XX1122223
+          111122223
+        `),
+        position: [-1, 1],
+        vector: [1, 0],
+      },
+      expected: {
+        free: true,
+        position: [0, 1],
+      },
+    },
+    {
+      msg: 'can not move right if there is an obstacle, T shape',
+      input: {
+        shape: [
+          [0, 0, 0, 0],
+          [0, 1, 0, 0],
+          [0, 1, 1, 0],
+          [0, 1, 0, 0],
+        ],
+        board: boardFromStr(`
+          XXXXXXXXX
+          XXXXXXXXX
+          XXX322223
+          XXX322223
+          XX1122223
+          111122223
+        `),
+        position: [0, 1],
+        vector: [1, 0],
+      },
+      expected: {
+        free: false,
+        position: [0, 1],
+      },
+    },
+    {
+      msg: 'can not move outside of board',
+      input: {
+        shape: [
+          [0, 1, 0, 0],
+          [0, 1, 0, 0],
+          [0, 1, 0, 0],
+          [0, 1, 0, 0],
+        ],
+        board: boardFromStr(`
+          XXXXXXX33
+          XXXXXXX22
+          XXXXXXX22
+          XXXXXXX11
+          XXXXXXX11
+          XXXXXXX11
+          XXXXXXX11
+          XXXXXXX11
+          XXXXXXX11
+          XXXXXXX11
+          111111111
+        `),
+        position: [-1, 3],
+        vector: [-1, 0],
+      },
+      expected: {
+        free: false,
+        position: [-1, 3],
+      },
+    },
+  ]
+
+  for (let {input, expected, msg} of cases) {
+    const actual = move(input)
+
+    t.deepEqual(actual, expected, msg)
+  }
+
+  t.end()
+})
 
 test('boardFromStr', t => {
   t.test('generates board from string', t => {
