@@ -257,10 +257,10 @@ const renderToContext = (ctx, width, height) => state => {
   const renderBlock = renderBlockToArea(ctx)(area)
 
   if (board) {
-    board.forEach((row, i) => 
+    board.slice(4).forEach((row, i) => 
       row.forEach((color, j) => {
         if (color !== -1) {
-          renderBlock(color, [j, i - 4])
+          renderBlock(color, [j, i])
         }
       })
     )
