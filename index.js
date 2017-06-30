@@ -67,11 +67,11 @@ const shapes = [
 ]
 
 const boardWidth = 10
-const boardHeight = 20
+const boardHeight = 24
 
 const emptyLine = n => Array(n).fill(-1)
 
-const randomInt = n => Math.floor(Math.random() * (max + 1))
+const randomInt = n => Math.floor(Math.random() * (n + 1))
 
 const makeInitialState = () => ({
   gameStatus: GameStatus.BEFORE,
@@ -81,10 +81,10 @@ const makeInitialState = () => ({
 })
 
 const makePlayer = () => {
-  const ind = randomInt(shapes.length)
+  const ind = randomInt(shapes.length - 1)
 
   return {
-    position: [randomInt(boardWidth - 4), -4],
+    position: [randomInt(boardWidth - 4 - 1), 0],
     shape: shapes[ind],
     color: ind,
   }
@@ -126,17 +126,15 @@ const step = (board, player) => {
     }
 
     // attach player to board
-    
-    const newBoard = [...board]
+
+    const newBoard = [...board].map(row => [...row])
     const [x, y] = player.position
 
     player.shape.forEach((row, i) =>
       row.forEach((cell, j) => {
-        if (cell === 0) {
-          return
+        if (cell !== 0) {
+          newBoard[i + y][j + x] = player.color
         }
-
-        newBoard[i + y][j + x] = player.color
       })
     )
 
@@ -218,16 +216,165 @@ const move = ({
   }
 }
 
-module.exports = {
-  randomInt,
-  makePlayer,
-  makeInitialState,
-  makeBoard,
-  shapes,
-  colors,
-  boardWidth,
-  boardHeight,
-  rotate,
-  move,
-  step,
+const renderBlockToArea = ctx => area => (color, [x, y]) => {
+  ctx.beginPath()
+  ctx.rect(area.x + area.blockSize * x, area.y + area.blockSize * y, area.blockSize, area.blockSize)
+  ctx.fillStyle = colors[color]
+  ctx.fill()
+}
+
+const renderToContext = (ctx, width, height) => state => {
+  const {
+    player,
+    board,
+    score,
+    gameStatus,
+  } = state
+
+  const boardW = boardWidth
+  const boardH = boardHeight - 4
+
+  const proportion = width / height
+  const reqProportion = boardW / boardH
+
+  const area = (proportion >= reqProportion) 
+    ? {
+      x: (width - boardW * (height / boardH)) / 2,
+      y: 0,
+      blockSize: Math.ceil(height / boardH),
+    }
+    : {
+      x: 0,
+      y: (height - boardH * (width / boardW)) / 2,
+      blockSize: Math.ceil(width / boardW),
+    }
+
+  ctx.beginPath()
+  ctx.rect(area.x, area.y, area.blockSize * boardW, area.blockSize * boardH)
+  ctx.fillStyle = '#000'
+  ctx.fill()
+
+  const renderBlock = renderBlockToArea(ctx)(area)
+
+  if (board) {
+    board.forEach((row, i) => 
+      row.forEach((color, j) => {
+        if (color !== -1) {
+          renderBlock(color, [j, i - 4])
+        }
+      })
+    )
+  }
+
+  if (player) {
+    const [playerX, playerY] = player.position
+    player.shape.forEach((row, i) => 
+      row.forEach((el, j) => {
+        if (el !== 0) {
+          renderBlock(player.color, [playerX + j, playerY + i - 4])
+        }
+      })
+    )
+  }
+}
+
+const update = state => {
+  const {
+    player,
+    board,
+    score,
+    gameStatus,
+  } = state
+  
+  if (gameStatus === GameStatus.BEFORE || gameStatus === GameStatus.AFTER) {
+    return state
+  }
+
+  const res = step(board, player)
+
+  return {
+    gameStatus,
+    score: score + res.removedLines,
+    player: player ? res.player : makePlayer(),
+    board: res.board,
+  }
+}
+
+const main = () => {
+  const canvas = document.getElementById('canvas')
+  const ctx = canvas.getContext('2d')
+
+  const width = document.body.clientWidth
+  const height = document.body.clientHeight
+
+  canvas.width = width
+  canvas.height = height
+
+  const render = renderToContext(ctx, width, height)
+
+  let state = makeInitialState()
+
+  document.addEventListener('keyup', e => {
+    if (state.gameStatus === GameStatus.BEFORE || state.gameStatus === GameStatus.AFTER) {
+      state.gameStatus = GameStatus.GAME
+      return
+    }
+
+    const {player, board} = state
+
+    if (!player) {
+      return
+    }
+
+    if (e.keyCode === 38) {
+      const newShape = rotate(state.player.shape)
+      if (move({
+        board,
+        shape: newShape,
+        position: player.position,
+        vector: [0, 0],
+      }).free) {
+        state.player.shape = newShape
+      }
+      return
+    }
+
+    const vector = (e.keyCode === 37) ? [-1, 0]
+      : (e.keyCode === 39) ? [1, 0] 
+      : (e.keyCode === 40) ? [0, 1]
+      : null
+    
+    if (vector) {
+      state.player.position = move({
+        board,
+        shape: player.shape,
+        position: player.position,
+        vector,
+      }).position
+    }
+  })
+
+  setInterval(() => {
+    state = update(state)
+  }, 400)
+
+  setInterval(() => {
+    render(state)
+  }, 1000 / 30)
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = {
+    randomInt,
+    makePlayer,
+    makeInitialState,
+    makeBoard,
+    shapes,
+    colors,
+    boardWidth,
+    boardHeight,
+    rotate,
+    move,
+    step,
+  }
 }
