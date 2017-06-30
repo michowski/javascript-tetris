@@ -276,16 +276,16 @@ test('step', t => {
   })
 
   t.test('moves player down if that is possible', t => {
-    t.test('case: simple ground, Bar shape', t => {
+    t.test('case: simple ground, T shape', t => {
       const player = {
-        position: [3, 3],
+        position: [2, 0],
         shape: [
           [0, 0, 0, 0],
-          [0, 0, 1, 0],
-          [0, 1, 1, 0],
+          [0, 0, 0, 0],
+          [1, 1, 1, 0],
           [0, 1, 0, 0],
         ],
-        color: colors[2],
+        color: 2,
       }
       const board = boardFromStr(`
         XXXXXXXX
@@ -302,7 +302,7 @@ test('step', t => {
         board,
         removedLines: 0,
         player: {
-          position: [3, 4],
+          position: [2, 1],
           shape: player.shape,
           color: player.color,
         },
@@ -321,7 +321,7 @@ test('step', t => {
           [0, 1, 1, 0],
           [0, 1, 0, 0],
         ],
-        color: colors[2],        
+        color: 2,        
       }
       const board = boardFromStr(`
         XXXXXXXX
@@ -359,7 +359,7 @@ test('step', t => {
           [0, 1, 1, 0],
           [0, 1, 0, 0],
         ],
-        color: colors[0],
+        color: 0,
       }
       const board = boardFromStr(`
         XXXXXXXX

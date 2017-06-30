@@ -86,7 +86,7 @@ const makePlayer = () => {
   return {
     position: [randomInt(boardWidth - 4), -4],
     shape: shapes[ind],
-    color: colors[ind],
+    color: ind,
   }
 }
 
@@ -105,12 +105,48 @@ const makeBoard = (width, height) => {
 
 const step = (board, player) => {
   if (player) {
-    return {
+    const {free, position} = move({
       board,
-      player,
+      shape: player.shape,
+      position: player.position,
+      vector: [0, 1],
+    })
+
+    // move player down
+    if (free) {
+      return {
+        board,
+        player: {
+          position,
+          shape: player.shape,
+          color: player.color, 
+        },
+        removedLines: 0,
+      }
+    }
+
+    const newBoard = [...board]
+    const [x, y] = player.position
+
+    player.shape.forEach((row, i) =>
+      row.forEach((cell, j) => {
+        if (cell === 0) {
+          return
+        }
+
+        newBoard[i + y][j + x] = player.color
+      })
+    )
+
+    // attach player to board
+    return {
       removedLines: 0,
+      board: newBoard,
+      player: null,
     }
   }
+
+  // remove lines
 
   const acc = board
     .reduce((acc, line, n) => {
