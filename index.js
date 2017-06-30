@@ -125,6 +125,8 @@ const step = (board, player) => {
       }
     }
 
+    // attach player to board
+    
     const newBoard = [...board]
     const [x, y] = player.position
 
@@ -138,7 +140,6 @@ const step = (board, player) => {
       })
     )
 
-    // attach player to board
     return {
       removedLines: 0,
       board: newBoard,
