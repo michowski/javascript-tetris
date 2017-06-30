@@ -350,7 +350,87 @@ test('step', t => {
   })
 
   t.test('attaches player to board if he can not move down', t => {
-    t.test('correctly converts shape and color of player to board', t => {
+    t.test('case: Bar shape, 2 lines as ground', t => {
+      const player = {
+        position: [4, 1],
+        shape: [
+          [0, 1, 0, 0],
+          [0, 1, 0, 0],
+          [0, 1, 0, 0],
+          [0, 1, 0, 0],
+        ],
+        color: 2,
+      }
+      const board = boardFromStr(`
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        33333333
+        11111111
+      `)
+
+      const actual = step(board, player)
+      const expected = {
+        board: boardFromStr(`
+          XXXXXXXX
+          XXXXX2XX
+          XXXXX2XX
+          XXXXX2XX
+          XXXXX2XX
+          33333333
+          11111111
+        `),
+        removedLines: 0,
+        player: null,
+      }
+
+      t.deepEqual(actual, expected)
+      t.end()
+    })
+
+    t.test('case: T shape, empty board', t => {
+      const player = {
+        position: [1, 3],
+        shape: [
+          [0, 0, 0, 0],
+          [0, 0, 0, 0],
+          [1, 1, 1, 0],
+          [0, 1, 0, 0],
+        ],
+        color: 2,
+      }
+      const board = boardFromStr(`
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+        XXXXXXXX
+      `)
+
+      const actual = step(board, player)
+      const expected = {
+        board: boardFromStr(`
+          XXXXXXXX
+          XXXXXXXX
+          XXXXXXXX
+          XXXXXXXX
+          XXXXXXXX
+          X222XXXX
+          XX2XXXXX
+        `),
+        removedLines: 0,
+        player: null,
+      }
+
+      t.deepEqual(actual, expected)
+      t.end()
+    })
+
+    t.test('case: Z shape, obstacles around', t => {
       const player = {
         position: [0, 1],
         shape: [
